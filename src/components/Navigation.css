@@ -1,0 +1,131 @@
+.bottom-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 8px 5px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  gap: 5px;
+  min-height: 80px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #6c757d;
+  padding: 8px 10px;
+  transition: color 0.2s;
+  min-width: 60px;
+  margin-top: 0;
+}
+
+.nav-item:hover {
+  color: #007bff;
+}
+
+.nav-item.active {
+  color: #007bff;
+}
+
+.nav-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.nav-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.nav-order-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 20px;
+  transition: color 0.2s;
+  min-width: 80px;
+  font-family: inherit;
+}
+
+.nav-order-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nav-order-button:not(.can-submit) {
+  opacity: 0.7;
+}
+
+.nav-order-button.can-submit {
+  color: #28a745;
+}
+
+.nav-order-button.can-submit:hover:not(:disabled) {
+  color: #218838;
+}
+
+.nav-delivery-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  max-width: 200px;
+  padding: 0 5px;
+  margin-top: 0;
+}
+
+.nav-delivery-input {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nav-delivery-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.nav-delivery-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.nav-order-submit-button {
+  padding: 6px 12px;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.nav-order-submit-button:hover:not(:disabled) {
+  background-color: #5a32a3;
+}
+
+.nav-order-submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #6c757d;
+}
+
