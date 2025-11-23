@@ -1,21 +1,36 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
+import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from "firebase/firestore";
 import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import "./Orders.css";
 
 export default function Orders() {
+  const { user } = useAuth();
+  const location = useLocation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingOrder, setEditingOrder] = useState(null);
   const [editDetails, setEditDetails] = useState("");
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (user) {
+      fetchOrders();
+    } else {
+      setLoading(false);
+    }
+  }, [user, location.pathname]); // Refresh when pathname changes (navigation)
 
   const fetchOrders = async () => {
+    if (!user) return;
+    
     try {
-      const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+      // Try with orderBy first (requires composite index)
+      const q = query(
+        collection(db, "orders"), 
+        where("userId", "==", user.id),
+        orderBy("createdAt", "desc")
+      );
       const querySnapshot = await getDocs(q);
       const ordersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -23,8 +38,32 @@ export default function Orders() {
       }));
       setOrders(ordersData);
     } catch (error) {
-      console.error("Error fetching orders:", error);
-      alert("Failed to load orders.");
+      console.error("Error fetching orders with orderBy:", error);
+      
+      // Fallback: fetch without orderBy and sort in memory
+      try {
+        const fallbackQuery = query(
+          collection(db, "orders"), 
+          where("userId", "==", user.id)
+        );
+        const fallbackSnapshot = await getDocs(fallbackQuery);
+        const ordersData = fallbackSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        // Sort by createdAt in descending order (newest first)
+        ordersData.sort((a, b) => {
+          const dateA = new Date(a.createdAt || 0);
+          const dateB = new Date(b.createdAt || 0);
+          return dateB - dateA;
+        });
+        
+        setOrders(ordersData);
+      } catch (fallbackError) {
+        console.error("Error fetching orders (fallback):", fallbackError);
+        alert("Failed to load orders. Please refresh the page.");
+      }
     } finally {
       setLoading(false);
     }
@@ -81,6 +120,12 @@ export default function Orders() {
     switch (status) {
       case "pending":
         return "#ffc107";
+      case "accepted":
+        return "#17a2b8";
+      case "in_progress":
+        return "#007bff";
+      case "delivered":
+        return "#28a745";
       case "confirmed":
         return "#28a745";
       case "cancelled":
@@ -113,7 +158,7 @@ export default function Orders() {
             <div key={order.id} className="order-card">
               <div className="order-header">
                 <div className="order-status" style={{ backgroundColor: getStatusColor(order.status) }}>
-                  {order.status?.toUpperCase() || "PENDING"}
+                  {order.status?.toUpperCase().replace("_", " ") || "PENDING"}
                 </div>
                 <div className="order-date">
                   {new Date(order.createdAt).toLocaleString()}
@@ -160,6 +205,30 @@ export default function Orders() {
                     <span className="info-value">{order.deliveryDetails || "N/A"}</span>
                   )}
                 </div>
+                {order.riderName && (
+                  <div className="info-row">
+                    <span className="info-label">🚴 Assigned Rider:</span>
+                    <span className="info-value">{order.riderName}</span>
+                  </div>
+                )}
+                {order.acceptedAt && (
+                  <div className="info-row">
+                    <span className="info-label">✅ Accepted At:</span>
+                    <span className="info-value">{new Date(order.acceptedAt).toLocaleString()}</span>
+                  </div>
+                )}
+                {order.startedAt && (
+                  <div className="info-row">
+                    <span className="info-label">🚀 Started At:</span>
+                    <span className="info-value">{new Date(order.startedAt).toLocaleString()}</span>
+                  </div>
+                )}
+                {order.deliveredAt && (
+                  <div className="info-row">
+                    <span className="info-label">🎉 Delivered At:</span>
+                    <span className="info-value">{new Date(order.deliveredAt).toLocaleString()}</span>
+                  </div>
+                )}
               </div>
 
               <div className="order-actions">

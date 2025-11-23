@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useOrder } from "../context/OrderContext";
+import { useAuth } from "../context/AuthContext";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
@@ -72,6 +73,7 @@ function ClickableMap({ onClick }) {
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { 
     setCanSubmit, 
     setOnSubmit, 
@@ -153,10 +155,19 @@ export default function Home() {
       return;
     }
 
+    if (!user) {
+      alert("Please login to place an order.");
+      navigate("/login");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Save order to Firestore
       const orderData = {
+        userId: user.id,
+        customerName: user.fullName,
+        customerPhone: user.phoneNumber,
         pickup: {
           lat: pickup.lat,
           lng: pickup.lng,

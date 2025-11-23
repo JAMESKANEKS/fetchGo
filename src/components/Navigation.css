@@ -86,7 +86,7 @@
 }
 
 .nav-delivery-input {
-  padding: 6px 8px;
+  padding: 10px 8px;
   border: 1px solid #999;
   border-radius: 4px;
   font-size: 12px;
@@ -129,5 +129,38 @@
   opacity: 0.6;
   cursor: not-allowed;
   background-color: #999;
+}
+
+.nav-user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  min-width: 60px;
+}
+
+.nav-user-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 60px;
+}
+
+.nav-logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 0;
+  transition: transform 0.2s;
+  line-height: 1;
+}
+
+.nav-logout-btn:hover {
+  transform: scale(1.1);
 }
 

@@ -1,9 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
 import { useOrder } from "../context/OrderContext";
+import { useAuth } from "../context/AuthContext";
 import "./Navigation.css";
 
 export default function Navigation() {
   const location = useLocation();
+  const { user, logout } = useAuth();
   const { deliveryDetails, setDeliveryDetails, pickup, destination, onSubmit, isSubmitting, canSubmit } = useOrder();
 
   const handleOrderClick = () => {
@@ -57,6 +59,23 @@ export default function Navigation() {
         <span className="nav-icon">☰</span>
         <span className="nav-label">Menu</span>
       </Link>
+      
+      {user ? (
+        <div className="nav-user-section">
+          <span className="nav-user-name">{user.fullName?.split(" ")[0] || "User"}</span>
+          <button onClick={logout} className="nav-logout-btn" title="Logout">
+            🚪
+          </button>
+        </div>
+      ) : (
+        <Link 
+          to="/login" 
+          className={`nav-item ${location.pathname === "/login" ? "active" : ""}`}
+        >
+          <span className="nav-icon">🔐</span>
+          <span className="nav-label">Login</span>
+        </Link>
+      )}
     </nav>
   );
 }

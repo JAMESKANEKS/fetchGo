@@ -1,0 +1,364 @@
+.rider-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.rider-login-box {
+  background-color: #e8e8e8;
+  border: 2px solid #999;
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.login-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.rider-login-box h1 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 28px;
+}
+
+.login-subtitle {
+  color: #666;
+  margin: 0 0 30px 0;
+  font-size: 14px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.password-input {
+  padding: 12px 16px;
+  border: 1px solid #999;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #d3d3d3;
+  color: #333;
+}
+
+.password-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+}
+
+.password-error {
+  color: #dc3545;
+  font-size: 14px;
+  margin: 0;
+  text-align: left;
+}
+
+.login-btn {
+  padding: 12px 24px;
+  background-color: #667eea;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-btn:hover {
+  background-color: #5568d3;
+}
+
+.login-hint {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+.rider-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
+  padding-bottom: 20px;
+  background-color: #f5f5f5;
+}
+
+.rider-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #999;
+}
+
+.rider-header h1 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 28px;
+}
+
+.rider-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.rider-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.rider-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding: 8px 16px;
+  background-color: #e8e8e8;
+  border: 1px solid #999;
+  border-radius: 4px;
+}
+
+.change-rider-btn {
+  padding: 6px 12px;
+  background-color: #999;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.change-rider-btn:hover {
+  background-color: #888;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+}
+
+.rider-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #999;
+  padding-bottom: 10px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  background-color: #e8e8e8;
+  color: #333;
+  border: 1px solid #999;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 120px;
+}
+
+.tab-btn:hover {
+  background-color: #d3d3d3;
+}
+
+.tab-btn.active {
+  background-color: #ffc107;
+  color: #333;
+  border-color: #ffb300;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+.no-orders {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #e8e8e8;
+  border-radius: 8px;
+  border: 1px solid #999;
+}
+
+.no-orders p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  background-color: #e8e8e8;
+  border: 1px solid #999;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #999;
+}
+
+.order-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.order-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+}
+
+.info-value {
+  color: #333;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.info-value.price {
+  font-weight: 700;
+  color: #333;
+  font-size: 18px;
+}
+
+.order-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #999;
+}
+
+.accept-btn {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+  transition: background-color 0.2s;
+}
+
+.accept-btn:hover {
+  background-color: #218838;
+}
+
+.start-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+  transition: background-color 0.2s;
+}
+
+.start-btn:hover {
+  background-color: #0056b3;
+}
+
+.complete-btn {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+  transition: background-color 0.2s;
+}
+
+.complete-btn:hover {
+  background-color: #218838;
+}
+
+.delivered-badge {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  flex: 1;
+}
+
