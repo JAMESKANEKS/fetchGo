@@ -60,14 +60,7 @@ export default function Navigation() {
         <span className="nav-label">Menu</span>
       </Link>
       
-      {user ? (
-        <div className="nav-user-section">
-          <span className="nav-user-name">{user.fullName?.split(" ")[0] || "User"}</span>
-          <button onClick={logout} className="nav-logout-btn" title="Logout">
-            🚪
-          </button>
-        </div>
-      ) : (
+      {!user && (
         <Link 
           to="/login" 
           className={`nav-item ${location.pathname === "/login" ? "active" : ""}`}

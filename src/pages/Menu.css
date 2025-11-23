@@ -63,3 +63,72 @@
   background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
 }
 
+.user-info-section {
+  margin-bottom: 30px;
+}
+
+.user-info-card {
+  background-color: #e8e8e8;
+  border: 1px solid #999;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.user-details {
+  flex: 1;
+  text-align: left;
+}
+
+.user-details h2 {
+  margin: 0 0 5px 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.user-details p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.logout-section {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.logout-button {
+  background-color: #dc3545;
+  color: #fff;
+  border: 1px solid #c82333;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s, transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logout-icon {
+  font-size: 20px;
+}
+
