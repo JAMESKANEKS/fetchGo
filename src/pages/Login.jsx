@@ -33,8 +33,16 @@ export default function Login() {
   };
 
   return (
+    
     <div className="auth-container">
-      <div className="auth-box">
+
+      <header>
+        <h1>Fetch<span>Go</span> - Delivery App</h1>
+      </header>
+
+      <div className="container2">
+
+        <div className="auth-box">
         <div className="auth-icon">🔐</div>
         <h1>Login</h1>
         <p className="auth-subtitle">Enter your phone number and password</p>
@@ -77,6 +85,9 @@ export default function Login() {
           Don't have an account? <Link to="/signup">Sign up here</Link>
         </p>
       </div>
+
+      </div>
+      
     </div>
   );
 }
