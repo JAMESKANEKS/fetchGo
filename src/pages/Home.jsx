@@ -8,6 +8,7 @@ import { useOrder } from "../context/OrderContext";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
+
 // Fix default Leaflet marker icons with proper anchor points
 const DefaultIcon = L.icon({
   iconUrl,
@@ -74,7 +75,6 @@ export default function Home() {
   const { 
     setCanSubmit, 
     setOnSubmit, 
-    isSubmitting, 
     setIsSubmitting, 
     deliveryDetails, 
     setDeliveryDetails,
@@ -105,8 +105,10 @@ export default function Home() {
           setRoute(routeData.coordinates);
           setDistance(routeData.distance);
           // Calculate price: every 2 km costs P22, proportionally for less than 2km
+          // Minimum price is P22
           const calculatedPrice = (routeData.distance / 2) * 22;
-          setPrice(Math.round(calculatedPrice * 100) / 100); // Round to 2 decimal places
+          const finalPrice = Math.max(calculatedPrice, 22); // Ensure minimum of P22
+          setPrice(Math.round(finalPrice * 100) / 100); // Round to 2 decimal places
         } else {
           setRoute(null);
           setDistance(null);
@@ -203,7 +205,9 @@ export default function Home() {
 
   return (
     <div className="container">
-      <h1>FetchGo - Pick-up & Destination Selector</h1>
+      <header>
+        <h1>Fetch<span>Go</span> - Delivery App</h1>
+      </header>
 
       <div className="address-inputs">
         <input
@@ -253,7 +257,7 @@ export default function Home() {
             <span className="detail-value">₱{price.toFixed(2)}</span>
           </div>
           <div className="detail-note">
-            (₱22 per 2 km, calculated proportionally)
+            (₱22 per 2 km, calculated proportionally, minimum ₱22)
           </div>
         </div>
       )}
