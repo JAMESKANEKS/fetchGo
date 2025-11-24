@@ -17,10 +17,11 @@ function hashPassword(password) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [rider, setRider] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
+    // Check if customer is logged in from localStorage
     const savedUser = localStorage.getItem("customerUser");
     if (savedUser) {
       try {
@@ -30,6 +31,18 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("customerUser");
       }
     }
+    
+    // Check if rider is logged in from localStorage
+    const savedRider = localStorage.getItem("riderUser");
+    if (savedRider) {
+      try {
+        setRider(JSON.parse(savedRider));
+      } catch (error) {
+        console.error("Error parsing saved rider:", error);
+        localStorage.removeItem("riderUser");
+      }
+    }
+    
     setLoading(false);
   }, []);
 
@@ -111,11 +124,99 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("customerUser");
   };
 
+  const riderSignup = async (fullName, phoneNumber, plateNumber, driverLicenceNumber, password) => {
+    try {
+      // Check if phone number already exists
+      const ridersRef = collection(db, "riders");
+      const q = query(ridersRef, where("phoneNumber", "==", phoneNumber));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        throw new Error("Phone number already registered. Please login instead.");
+      }
+
+      // Create new rider
+      const hashedPassword = hashPassword(password);
+      const riderData = {
+        fullName,
+        phoneNumber,
+        plateNumber,
+        driverLicenceNumber,
+        password: hashedPassword,
+        createdAt: new Date().toISOString()
+      };
+
+      const docRef = await addDoc(collection(db, "riders"), riderData);
+      
+      const newRider = {
+        id: docRef.id,
+        ...riderData
+      };
+
+      // Don't store password in rider object
+      delete newRider.password;
+      setRider(newRider);
+      localStorage.setItem("riderUser", JSON.stringify(newRider));
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Rider signup error:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const riderLogin = async (phoneNumber, password) => {
+    try {
+      const ridersRef = collection(db, "riders");
+      const q = query(ridersRef, where("phoneNumber", "==", phoneNumber));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        return { success: false, error: "Phone number not found. Please sign up first." };
+      }
+
+      const riderDoc = querySnapshot.docs[0];
+      const riderData = riderDoc.data();
+      const hashedPassword = hashPassword(password);
+
+      if (riderData.password !== hashedPassword) {
+        return { success: false, error: "Incorrect password." };
+      }
+
+      const rider = {
+        id: riderDoc.id,
+        fullName: riderData.fullName,
+        phoneNumber: riderData.phoneNumber,
+        plateNumber: riderData.plateNumber,
+        driverLicenceNumber: riderData.driverLicenceNumber
+      };
+
+      setRider(rider);
+      localStorage.setItem("riderUser", JSON.stringify(rider));
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Rider login error:", error);
+      return { success: false, error: "Login failed. Please try again." };
+    }
+  };
+
+  const riderLogout = () => {
+    setRider(null);
+    localStorage.removeItem("riderUser");
+    localStorage.removeItem("riderAuthenticated");
+    localStorage.removeItem("riderName");
+  };
+
   const value = {
     user,
+    rider,
     signup,
     login,
     logout,
+    riderSignup,
+    riderLogin,
+    riderLogout,
     loading
   };
 
@@ -133,4 +234,6 @@ export function useAuth() {
   }
   return context;
 }
+
+
 

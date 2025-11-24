@@ -1,43 +1,27 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { collection, getDocs, doc, updateDoc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import "./Rider.css";
 
-// Rider access password - Change this to your desired password
-const RIDER_ACCESS_PASSWORD = "rider123"; // You can change this password
-
 export default function Rider() {
+  const navigate = useNavigate();
+  const { rider, riderLogout } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("available"); // available, accepted, in_progress, delivered
-  const [riderName, setRiderName] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
-    // Check if rider is already authenticated
-    const riderAuth = localStorage.getItem("riderAuthenticated");
-    if (riderAuth === "true") {
-      setIsAuthenticated(true);
-      
-      // Set rider name from localStorage or prompt
-      const savedRiderName = localStorage.getItem("riderName");
-      if (savedRiderName) {
-        setRiderName(savedRiderName);
-      } else {
-        const name = prompt("Enter your rider name:");
-        if (name) {
-          setRiderName(name);
-          localStorage.setItem("riderName", name);
-        }
-      }
+    // Redirect to login if not authenticated
+    if (!rider) {
+      navigate("/rider-login");
     }
-  }, []);
+  }, [rider, navigate]);
 
   useEffect(() => {
     // Set up real-time listener for orders only when authenticated
-    if (!isAuthenticated) {
+    if (!rider) {
       return;
     }
 
@@ -58,45 +42,18 @@ export default function Rider() {
     });
 
     return () => unsubscribe();
-  }, [isAuthenticated]);
-
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    if (password === RIDER_ACCESS_PASSWORD) {
-      setIsAuthenticated(true);
-      localStorage.setItem("riderAuthenticated", "true");
-      setPasswordError("");
-      
-      // Set rider name from localStorage or prompt
-      const savedRiderName = localStorage.getItem("riderName");
-      if (savedRiderName) {
-        setRiderName(savedRiderName);
-      } else {
-        const name = prompt("Enter your rider name:");
-        if (name) {
-          setRiderName(name);
-          localStorage.setItem("riderName", name);
-        }
-      }
-    } else {
-      setPasswordError("Incorrect password. Access denied.");
-      setPassword("");
-    }
-  };
+  }, [rider]);
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
-      setIsAuthenticated(false);
-      localStorage.removeItem("riderAuthenticated");
-      setPassword("");
-      setRiderName("");
-      localStorage.removeItem("riderName");
+      riderLogout();
+      navigate("/rider-login");
     }
   };
 
   const handleAcceptOrder = async (orderId) => {
-    if (!riderName) {
-      alert("Please set your rider name first.");
+    if (!rider) {
+      alert("Please login first.");
       return;
     }
 
@@ -108,7 +65,7 @@ export default function Rider() {
       const orderRef = doc(db, "orders", orderId);
       await updateDoc(orderRef, {
         status: "accepted",
-        riderName: riderName,
+        riderName: rider.fullName,
         acceptedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
@@ -171,15 +128,17 @@ export default function Rider() {
   };
 
   const getFilteredOrders = () => {
+    if (!rider) return [];
+    
     switch (activeTab) {
       case "available":
         return orders.filter(order => order.status === "pending");
       case "accepted":
-        return orders.filter(order => order.status === "accepted" && order.riderName === riderName);
+        return orders.filter(order => order.status === "accepted" && order.riderName === rider.fullName);
       case "in_progress":
-        return orders.filter(order => order.status === "in_progress" && order.riderName === riderName);
+        return orders.filter(order => order.status === "in_progress" && order.riderName === rider.fullName);
       case "delivered":
-        return orders.filter(order => order.status === "delivered" && order.riderName === riderName);
+        return orders.filter(order => order.status === "delivered" && order.riderName === rider.fullName);
       default:
         return [];
     }
@@ -187,33 +146,11 @@ export default function Rider() {
 
   const filteredOrders = getFilteredOrders();
 
-  // Show login screen if not authenticated
-  if (!isAuthenticated) {
+  // Show loading or redirect if not authenticated
+  if (!rider) {
     return (
-      <div className="rider-login-container">
-        <div className="rider-login-box">
-          <div className="login-icon">🚴</div>
-          <h1>Rider Access</h1>
-          <p className="login-subtitle">Enter password to access rider dashboard</p>
-          <form onSubmit={handlePasswordSubmit} className="login-form">
-            <input
-              type="password"
-              placeholder="Enter access password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordError("");
-              }}
-              className="password-input"
-              autoFocus
-            />
-            {passwordError && <p className="password-error">{passwordError}</p>}
-            <button type="submit" className="login-btn">
-              Access Dashboard
-            </button>
-          </form>
-          <p className="login-hint">Default password: rider123</p>
-        </div>
+      <div className="rider-container">
+        <div className="loading">Loading...</div>
       </div>
     );
   }
@@ -234,21 +171,9 @@ export default function Rider() {
       <div className="rider-header">
         <h1>🚴 Rider Dashboard</h1>
         <div className="rider-header-actions">
-          {riderName && (
+          {rider && (
             <div className="rider-info">
-              <span className="rider-name">Rider: {riderName}</span>
-              <button 
-                onClick={() => {
-                  const newName = prompt("Enter new rider name:", riderName);
-                  if (newName) {
-                    setRiderName(newName);
-                    localStorage.setItem("riderName", newName);
-                  }
-                }}
-                className="change-rider-btn"
-              >
-                Change Name
-              </button>
+              <span className="rider-name">Rider: {rider.fullName}</span>
             </div>
           )}
           <button onClick={handleLogout} className="logout-btn">
@@ -268,19 +193,19 @@ export default function Rider() {
           className={`tab-btn ${activeTab === "accepted" ? "active" : ""}`}
           onClick={() => setActiveTab("accepted")}
         >
-          Accepted ({orders.filter(o => o.status === "accepted" && o.riderName === riderName).length})
+          Accepted ({orders.filter(o => o.status === "accepted" && o.riderName === rider?.fullName).length})
         </button>
         <button
           className={`tab-btn ${activeTab === "in_progress" ? "active" : ""}`}
           onClick={() => setActiveTab("in_progress")}
         >
-          In Progress ({orders.filter(o => o.status === "in_progress" && o.riderName === riderName).length})
+          In Progress ({orders.filter(o => o.status === "in_progress" && o.riderName === rider?.fullName).length})
         </button>
         <button
           className={`tab-btn ${activeTab === "delivered" ? "active" : ""}`}
           onClick={() => setActiveTab("delivered")}
         >
-          Delivered ({orders.filter(o => o.status === "delivered" && o.riderName === riderName).length})
+          Delivered ({orders.filter(o => o.status === "delivered" && o.riderName === rider?.fullName).length})
         </button>
       </div>
 
@@ -307,6 +232,25 @@ export default function Rider() {
               </div>
 
               <div className="order-info">
+                {(order.customerName || order.customerPhone) && (
+                  <div className="customer-info-section">
+                    <div className="info-row">
+                      <span className="info-label">👤 Customer Name:</span>
+                      <span className="info-value customer-name">{order.customerName || "N/A"}</span>
+                    </div>
+                    {order.customerPhone && (
+                      <div className="info-row">
+                        <span className="info-label">📞 Phone Number:</span>
+                        <a 
+                          href={`tel:${order.customerPhone}`} 
+                          className="info-value phone-link"
+                        >
+                          {order.customerPhone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="info-row">
                   <span className="info-label">📍 Pickup:</span>
                   <span className="info-value">{order.pickup?.address || "N/A"}</span>
@@ -354,6 +298,20 @@ export default function Rider() {
               </div>
 
               <div className="order-actions">
+                <button
+                  onClick={() => navigate(`/order-map?orderId=${order.id}`)}
+                  className="view-map-btn"
+                >
+                  🗺️ View Map
+                </button>
+                {order.riderName && (
+                  <button
+                    onClick={() => navigate(`/rider-chat?orderId=${order.id}`)}
+                    className="chat-btn"
+                  >
+                    💬 Chat
+                  </button>
+                )}
                 {order.status === "pending" && (
                   <button
                     onClick={() => handleAcceptOrder(order.id)}
@@ -362,7 +320,7 @@ export default function Rider() {
                     Accept Order
                   </button>
                 )}
-                {order.status === "accepted" && order.riderName === riderName && (
+                {order.status === "accepted" && order.riderName === rider?.fullName && (
                   <button
                     onClick={() => handleStartDelivery(order.id)}
                     className="start-btn"
@@ -370,7 +328,7 @@ export default function Rider() {
                     Start Delivery
                   </button>
                 )}
-                {order.status === "in_progress" && order.riderName === riderName && (
+                {order.status === "in_progress" && order.riderName === rider?.fullName && (
                   <button
                     onClick={() => handleCompleteDelivery(order.id)}
                     className="complete-btn"

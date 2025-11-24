@@ -199,3 +199,20 @@
   background-color: #888;
 }
 
+.chat-btn {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  flex: 1;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.chat-btn:hover {
+  background-color: #218838;
+}
+

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents, Popup, Polyline } from "react-leaflet";
+import { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import L from "leaflet";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useOrder } from "../context/OrderContext";
@@ -61,18 +61,9 @@ async function getRoute(startLat, startLng, endLat, endLng) {
   }
 }
 
-// Component to handle map clicks
-function ClickableMap({ onClick }) {
-  useMapEvents({
-    click: (e) => {
-      onClick(e.latlng);
-    },
-  });
-  return null;
-}
-
 export default function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { 
     setCanSubmit, 
@@ -85,13 +76,64 @@ export default function Home() {
     destination,
     setDestination
   } = useOrder();
-  const [pickupAddress, setPickupAddress] = useState("");
-  const [destinationAddress, setDestinationAddress] = useState("");
-  const [settingPickup, setSettingPickup] = useState(false);
-  const [settingDestination, setSettingDestination] = useState(false);
+  // Initialize addresses from localStorage if available
+  const [pickupAddress, setPickupAddress] = useState(() => {
+    return localStorage.getItem("pickupAddress") || "";
+  });
+  const [destinationAddress, setDestinationAddress] = useState(() => {
+    return localStorage.getItem("destinationAddress") || "";
+  });
   const [route, setRoute] = useState(null);
   const [distance, setDistance] = useState(null);
   const [price, setPrice] = useState(null);
+  const processedLocationRef = useRef(null);
+
+  // Save addresses to localStorage whenever they change
+  useEffect(() => {
+    if (pickupAddress) {
+      localStorage.setItem("pickupAddress", pickupAddress);
+    } else {
+      localStorage.removeItem("pickupAddress");
+    }
+  }, [pickupAddress]);
+
+  useEffect(() => {
+    if (destinationAddress) {
+      localStorage.setItem("destinationAddress", destinationAddress);
+    } else {
+      localStorage.removeItem("destinationAddress");
+    }
+  }, [destinationAddress]);
+
+  // Handle location data from LocationPicker
+  useEffect(() => {
+    const locationState = location.state;
+    
+    // Check if we have new location data and haven't processed it yet
+    if (locationState?.location && locationState?.address && locationState?.type) {
+      const stateKey = `${locationState.type}-${locationState.location.lat}-${locationState.location.lng}`;
+      
+      // Only process if this is a new location (not already processed)
+      if (processedLocationRef.current !== stateKey) {
+        const { location: loc, address, type } = locationState;
+        
+        // Only update the specific location type, preserve the other
+        if (type === "pickup") {
+          setPickup(loc);
+          setPickupAddress(address);
+        } else if (type === "destination") {
+          setDestination(loc);
+          setDestinationAddress(address);
+        }
+        
+        // Mark as processed
+        processedLocationRef.current = stateKey;
+        
+        // Clear the state to avoid re-processing
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state, setPickup, setDestination]);
 
   // Fetch route when both pickup and destination are set
   useEffect(() => {
@@ -130,20 +172,6 @@ export default function Home() {
     const isValid = pickup && destination && deliveryDetails.trim().length > 0;
     setCanSubmit(isValid);
   }, [pickup, destination, deliveryDetails, setCanSubmit]);
-
-  const handleMapClick = async (latlng) => {
-    if (settingPickup) {
-      setPickup(latlng);
-      const address = await getAddressFromCoords(latlng.lat, latlng.lng);
-      setPickupAddress(address);
-      setSettingPickup(false);
-    } else if (settingDestination) {
-      setDestination(latlng);
-      const address = await getAddressFromCoords(latlng.lat, latlng.lng);
-      setDestinationAddress(address);
-      setSettingDestination(false);
-    }
-  };
 
   const handleSubmit = async () => {
     if (!pickup || !destination) {
@@ -197,6 +225,9 @@ export default function Home() {
       setRoute(null);
       setDistance(null);
       setPrice(null);
+      // Clear localStorage
+      localStorage.removeItem("pickupAddress");
+      localStorage.removeItem("destinationAddress");
       
       // Navigate to orders page
       navigate("/orders");
@@ -238,9 +269,7 @@ export default function Home() {
       <div className="buttons">
         <button
           onClick={() => {
-            setSettingPickup(true);
-            setSettingDestination(false);
-            alert("Click on the map to set Pickup location.");
+            navigate("/location-picker?type=pickup");
           }}
         >
           Set Pickup
@@ -248,9 +277,7 @@ export default function Home() {
 
         <button
           onClick={() => {
-            setSettingDestination(true);
-            setSettingPickup(false);
-            alert("Click on the map to set Destination location.");
+            navigate("/location-picker?type=destination");
           }}
         >
           Set Destination
@@ -275,16 +302,20 @@ export default function Home() {
 
       <div className="map-container">
         <MapContainer
-          center={[10.3779, 123.6386]}
-          zoom={14}
+          center={
+            pickup && destination
+              ? [(pickup.lat + destination.lat) / 2, (pickup.lng + destination.lng) / 2]
+              : [10.3779, 123.6386]
+          }
+          zoom={pickup && destination ? 13 : 14}
           scrollWheelZoom={true}
           style={{ width: "100%", height: "100%", minHeight: "300px" }}
+          key={`${pickup?.lat}-${pickup?.lng}-${destination?.lat}-${destination?.lng}`}
         >
           <TileLayer 
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
           />
-          <ClickableMap onClick={handleMapClick} />
           {route && (
             <Polyline
               positions={route}

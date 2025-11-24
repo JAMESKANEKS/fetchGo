@@ -293,8 +293,35 @@
   font-size: 18px;
 }
 
+.customer-info-section {
+  background-color: #d3d3d3;
+  border: 1px solid #999;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+.customer-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.phone-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.phone-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
 .order-actions {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   padding-top: 15px;
   border-top: 1px solid #999;
@@ -360,5 +387,47 @@
   font-weight: 600;
   text-align: center;
   flex: 1;
+}
+
+.view-map-btn {
+  padding: 10px 20px;
+  background-color: #17a2b8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+  transition: background-color 0.2s;
+}
+
+.view-map-btn:hover {
+  background-color: #138496;
+}
+
+.chat-btn {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+  transition: background-color 0.2s;
+}
+
+.chat-btn:hover {
+  background-color: #218838;
+}
+
+.order-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #999;
 }
 

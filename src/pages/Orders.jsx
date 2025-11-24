@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
@@ -8,6 +8,7 @@ import "./Orders.css";
 export default function Orders() {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingOrder, setEditingOrder] = useState(null);
@@ -234,6 +235,14 @@ export default function Orders() {
               <div className="order-actions">
                 {editingOrder !== order.id && (
                   <>
+                    {order.riderName && (
+                      <button
+                        onClick={() => navigate(`/chat?orderId=${order.id}`)}
+                        className="chat-btn"
+                      >
+                        💬 Chat with Rider
+                      </button>
+                    )}
                     <button
                       onClick={() => handleEdit(order)}
                       className="edit-btn"
