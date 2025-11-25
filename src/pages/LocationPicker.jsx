@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -17,6 +17,15 @@ const DefaultIcon = L.icon({
   shadowAnchor: [12, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
+
+// Custom icon for user's current location (blue dot)
+const CurrentLocationIcon = L.divIcon({
+  className: 'current-location-marker',
+  html: '<div style="background-color: #007bff; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);"></div>',
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+  popupAnchor: [0, -10],
+});
 
 // Reverse geocoding using OpenStreetMap Nominatim
 async function getAddressFromCoords(lat, lng) {
@@ -42,6 +51,41 @@ function ClickableMap({ onLocationSelect }) {
   return null;
 }
 
+// Component to handle map controls and track user location
+function MapControls({ userLocation, onCenterToUser }) {
+  const map = useMap();
+
+  useEffect(() => {
+    // Add custom button to center on user location
+    const button = L.control({ position: 'topright' });
+    button.onAdd = () => {
+      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+      div.style.backgroundColor = 'white';
+      div.style.width = '40px';
+      div.style.height = '40px';
+      div.style.borderRadius = '4px';
+      div.style.border = '2px solid #ccc';
+      div.style.cursor = 'pointer';
+      div.innerHTML = '📍';
+      div.style.lineHeight = '40px';
+      div.style.textAlign = 'center';
+      div.style.fontSize = '20px';
+      
+      L.DomEvent.disableClickPropagation(div);
+      div.addEventListener('click', onCenterToUser);
+      
+      return div;
+    };
+    button.addTo(map);
+
+    return () => {
+      button.remove();
+    };
+  }, [map, onCenterToUser]);
+
+  return null;
+}
+
 export default function LocationPicker() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -51,13 +95,20 @@ export default function LocationPicker() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [mapCenter, setMapCenter] = useState([10.3779, 123.6386]); // Default center
+  const [userLocation, setUserLocation] = useState(null);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     // Get user's current location if available
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setMapCenter([position.coords.latitude, position.coords.longitude]);
+          const userLoc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setUserLocation(userLoc);
+          setMapCenter([userLoc.lat, userLoc.lng]);
         },
         () => {
           // Use default center if geolocation fails
@@ -72,6 +123,12 @@ export default function LocationPicker() {
     const addr = await getAddressFromCoords(latlng.lat, latlng.lng);
     setAddress(addr);
     setLoading(false);
+  };
+
+  const handleCenterToUser = () => {
+    if (userLocation && mapRef.current) {
+      mapRef.current.setView([userLocation.lat, userLocation.lng], 16);
+    }
   };
 
   const handleDone = () => {
@@ -111,12 +168,21 @@ export default function LocationPicker() {
           zoom={14}
           scrollWheelZoom={true}
           style={{ width: "100%", height: "100%" }}
+          ref={mapRef}
         >
           <TileLayer 
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
           />
+          <MapControls userLocation={userLocation} onCenterToUser={handleCenterToUser} />
           <ClickableMap onLocationSelect={handleMapClick} />
+          {userLocation && (
+            <Marker 
+              position={[userLocation.lat, userLocation.lng]}
+              icon={CurrentLocationIcon}
+              title="Your Current Location"
+            />
+          )}
           {selectedLocation && (
             <Marker position={[selectedLocation.lat, selectedLocation.lng]} />
           )}
@@ -149,6 +215,7 @@ export default function LocationPicker() {
     </div>
   );
 }
+
 
 
 
