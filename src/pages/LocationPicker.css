@@ -1,3 +1,16 @@
+/* PREVENT ANY PAGE OVERFLOW */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* 💯 stops right-side overflow */
+  margin: 0;
+  padding: 0;
+}
+
 .location-picker-container {
   display: flex;
   flex-direction: column;
@@ -8,17 +21,25 @@
   left: 0;
   background-color: #f5f5f5;
   z-index: 2000;
+
+  /* Prevent overflow inside */
+  overflow-x: hidden;
 }
 
+/* HEADER */
 .location-picker-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   padding: 15px 20px;
   background-color: #e8e8e8;
   border-bottom: 1px solid #999;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+  width: 100%;
+  max-width: 100%; /* 💯 prevents header overflow */
+  overflow-x: hidden;
 }
 
 .location-picker-header h2 {
@@ -27,42 +48,52 @@
   color: #333;
   flex: 1;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Responsive title */
 }
 
 .back-button {
   background-color: transparent;
   border: 1px solid #999;
   border-radius: 6px;
-  padding: 8px 16px;
+  padding: 8px 12px;
   font-size: 14px;
-  color: #333;
   cursor: pointer;
-  transition: background-color 0.2s;
-  font-weight: 600;
+  white-space: nowrap;
 }
 
-.back-button:hover {
-  background-color: #d3d3d3;
-}
-
+/* MAP WRAPPER */
 .map-wrapper {
   flex: 1;
   width: 100%;
   position: relative;
   overflow: hidden;
+
+  margin-bottom: 150px;
+  max-width: 100%; /* 💯 map will never overflow */
 }
 
+/* FOOTER */
 .location-picker-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  max-width: 100%; /* 💯 prevents overflow */
+
   background-color: #e8e8e8;
   border-top: 1px solid #999;
   padding: 20px;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
 }
 
 .address-display {
   margin-bottom: 15px;
   min-height: 60px;
+  width: 100%;
+  word-break: break-word; /* long address never breaks layout */
 }
 
 .address-label {
@@ -70,42 +101,33 @@
   font-size: 12px;
   font-weight: 600;
   color: #666;
-  text-transform: uppercase;
 }
 
 .address-text {
   margin: 0;
   font-size: 14px;
   color: #333;
-  line-height: 1.4;
-  word-break: break-word;
 }
 
+/* DONE BUTTON */
 .done-button {
   width: 100%;
   padding: 14px 24px;
   background-color: #ffc107;
-  color: #333;
   border: none;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.done-button:hover:not(:disabled) {
-  background-color: #ffb300;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .done-button:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
-  background-color: #999;
 }
 
-
-
+/* iPhone viewport bug fix */
+@supports (-webkit-touch-callout: none) {
+  .location-picker-container {
+    height: -webkit-fill-available;
+  }
+}
