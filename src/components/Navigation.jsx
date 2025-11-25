@@ -33,7 +33,7 @@ export default function Navigation() {
           className="nav-order-submit-button"
           disabled={!canSubmit || isSubmitting || !pickup || !destination}
         >
-          {isSubmitting ? "Processing..." : "Order"}
+          {isSubmitting ? "Processing..." : "Order Now"}
         </button>
       </div>
 
