@@ -15,6 +15,7 @@
   min-height: 80px;
 }
 
+
 .nav-item {
   display: flex;
   flex-direction: column;
@@ -94,6 +95,7 @@
   box-sizing: border-box;
   background-color: #d3d3d3;
   color: #333;
+  height: 50px;
 }
 
 .nav-delivery-input:focus {

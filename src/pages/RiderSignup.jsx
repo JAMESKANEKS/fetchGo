@@ -144,6 +144,8 @@ export default function RiderSignup() {
                 disabled={loading}
               />
             </div>
+
+            <a href="#"><button>Submit Your ID and OR/CR Here</button></a>
             
             <button type="submit" className="auth-button" disabled={loading}>
               {loading ? "Creating account..." : "Sign Up"}
@@ -158,4 +160,5 @@ export default function RiderSignup() {
     </div>
   );
 }
+
 

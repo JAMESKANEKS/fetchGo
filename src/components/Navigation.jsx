@@ -18,15 +18,8 @@ export default function Navigation() {
 
   return (
     <nav className="bottom-navigation">
-      <Link 
-        to="/" 
-        className={`nav-item ${location.pathname === "/" ? "active" : ""}`}
-      >
-        <span className="nav-icon">🏠</span>
-        <span className="nav-label">Home</span>
-      </Link>
-      
-      <div className="nav-delivery-section">
+
+     <div className="nav-delivery-section">
         <input
           type="text"
           placeholder="Delivery Details *"
@@ -43,6 +36,16 @@ export default function Navigation() {
           {isSubmitting ? "Processing..." : "Order"}
         </button>
       </div>
+
+      <Link 
+        to="/" 
+        className={`nav-item ${location.pathname === "/" ? "active" : ""}`}
+      >
+        <span className="nav-icon">🏠</span>
+        <span className="nav-label">Home</span>
+      </Link>
+      
+      
 
       <Link 
         to="/orders" 
