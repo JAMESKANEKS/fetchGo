@@ -1,154 +1,130 @@
-/* GLOBAL FIXES */
+/* GLOBAL FIX */
 * {
   box-sizing: border-box;
 }
 
 html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden; /* stops right-side overflow */
   margin: 0;
   padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  height: 100%;
 }
 
 /* MAIN CONTAINER */
 .location-picker-container {
+  position: fixed;
+  inset: 0; /* top:0 left:0 right:0 bottom:0 */
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: #f5f5f5;
-  z-index: 2000;
 
-  overflow-x: hidden;
+  height: 100vh;
+  height: 100dvh; /* supports all mobile devices */
+
+  background-color: #f5f5f5;
+  overflow: hidden;
+  z-index: 2000;
 }
 
 /* HEADER */
 .location-picker-header {
+  flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
   padding: 15px 20px;
-  background-color: #e8e8e8;
+  background: #e8e8e8;
   border-bottom: 1px solid #999;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
   width: 100%;
-  max-width: 100%; /* prevents overflow */
 }
 
 .location-picker-header h2 {
   margin: 0;
-  font-size: 18px;
-  color: #333;
   flex: 1;
   text-align: center;
+  font-size: 18px;
 
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* responsive title */
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .back-button {
-  background-color: transparent;
-  border: 1px solid #999;
-  border-radius: 6px;
-
-  padding: 8px 14px; /* reduced slightly for mobile */
+  padding: 8px 12px;
   font-size: 14px;
-  color: #333;
-
+  border-radius: 6px;
+  border: 1px solid #999;
+  background: transparent;
   cursor: pointer;
-  transition: background-color 0.2s;
-  font-weight: 600;
-
-  white-space: nowrap; /* prevents layout break */
+  white-space: nowrap;
 }
 
-.back-button:hover {
-  background-color: #d3d3d3;
-}
-
-/* MAP AREA */
+/* MAP AREA — WILL NOT OVERFLOW ANYMORE */
 .map-wrapper {
-  flex: 1;
+  flex: 1;           /* fills the remaining space */
+  min-height: 0;     /* IMPORTANT: allows shrinking */
   width: 100%;
-  max-width: 100%; /* ensures no overflow */
-
-  position: relative;
   overflow: hidden;
+  position: relative;
 }
 
-/* FOOTER */
+/* FIXED FOOTER AT BOTTOM */
 .location-picker-footer {
-  background-color: #e8e8e8;
-  border-top: 1px solid #999;
-  padding: 20px;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  left: 0;
+  bottom: 0;
 
   width: 100%;
-  max-width: 100%; /* stops overflow */
+  background: #e8e8e8;
+  border-top: 1px solid #999;
+
+  padding: 16px 20px;
+  z-index: 3000;
+
+  /* Safe areas for iPhone */
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }
 
+/* ADDRESS TEXT */
 .address-display {
-  margin-bottom: 15px;
-  min-height: 60px;
   width: 100%;
-  word-break: break-word; /* prevents long address overflow */
+  min-height: 55px;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
 }
 
 .address-label {
-  margin: 0 0 8px 0;
+  margin-bottom: 6px;
   font-size: 12px;
   font-weight: 600;
   color: #666;
-  text-transform: uppercase;
 }
 
 .address-text {
-  margin: 0;
   font-size: 14px;
   color: #333;
   line-height: 1.4;
-  word-break: break-word;
 }
 
 /* DONE BUTTON */
 .done-button {
   width: 100%;
-  padding: 14px 24px;
-  background-color: #ffc107;
-  color: #333;
-
-  border: none;
-  border-radius: 8px;
-
+  padding: 14px;
   font-size: 16px;
+  border-radius: 8px;
+  background: #ffc107;
+  border: none;
   font-weight: 600;
-
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
-
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.done-button:hover:not(:disabled) {
-  background-color: #ffb300;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .done-button:disabled {
-  opacity: 0.5;
+  background: #999;
   cursor: not-allowed;
-  background-color: #999;
 }
 
-/* iPhone viewport fix */
+/* SAFARI HEIGHT FIX */
 @supports (-webkit-touch-callout: none) {
   .location-picker-container {
     height: -webkit-fill-available;
